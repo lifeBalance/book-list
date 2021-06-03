@@ -18,7 +18,6 @@ UI.prototype.addBookToList = function(book) {
     <td><a href="#" class="delete">X</a></td>
   `;
   listElem.appendChild(rowElem);
-  console.log(rowElem);
 };
 
 // clear the input fields
