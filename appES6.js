@@ -45,9 +45,45 @@ class UI {
   }
 }
 
+class Store {
+  static getBooks() {
+    let books;
+    if (localStorage.getItem('books') === null)
+      books = [];
+    else
+      books = JSON.parse(localStorage.getItem('books'));
+    return books;
+  }
+  static displayBooks() {
+    const books = Store.getBooks();
+    books.forEach(book => {
+      const ui = new UI();
+      ui.addBookToList(book);
+    });
+  }
+  static addBook(book) {
+    const books = Store.getBooks();
+    books.push(book);
+    localStorage.setItem('books', JSON.stringify(books));
+    // console.log(localStorage.getItem('books'));
+  }
+  static removeBook(isbn) {
+    console.log(isbn);
+    const books = Store.getBooks();
+    books.forEach((book, idx) => {
+      if (book.isbn === isbn)
+        books.splice(idx, 1);
+    });
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+}
+
 /*
 ** Event listeners
 */
+// DOM load event
+document.addEventListener('DOMContentLoaded', Store.displayBooks());
+
 // Event listener for adding books
 const bookForm = document.getElementById('book-form');
 bookForm.addEventListener('submit', function (event) {
@@ -72,6 +108,7 @@ bookForm.addEventListener('submit', function (event) {
     ui.showAlert('Please fill in all fields', 'error');
   } else {
     ui.addBookToList(book);                               // Add book to the UI
+    Store.addBook(book);                                  // Store in LS
     ui.showAlert('Book succesfully added!', `success`);   // Show alert
     ui.clearFields();                                     // Clear input fields
   }
@@ -83,6 +120,8 @@ const bookList = document.getElementById('book-list');    // tbody
 bookList.addEventListener('click', function (event) {
   const ui = new UI();                        // Instantiate UI
   ui.deleteBook(event.target);                // delete the book
+  const isbn = event.target.parentElement.previousElementSibling.textContent;
+  Store.removeBook(isbn);                     // remove from LS
   ui.showAlert('Book removed!', 'success');   // show notification
   event.preventDefault();
 });
